@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Aniversário, Mãe!</title>
+    <!-- Biblioteca para o efeito de confetes no final -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #fdf6f0;
+            --card-bg: #ffffff;
+            --primary-color: #e07a5f;
+            --accent-color: #3d405b;
+            --text-color: #2b2d42;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-container {
+            width: 170px;
+            height: 170px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-container:hover {
+            transform: scale(1.03);
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scene-title {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .dialog-box {
+            background-color: #f4f1de;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-choice {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 0.98rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .btn-choice:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .final-card {
+            display: none;
+            text-align: left;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            color: #333;
+        }
+
+        .final-card h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .heart {
+            color: #e63946;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div id="game-view">
+        <div class="avatar-container">
+            <img id="avatar" class="avatar" src="http://googleusercontent.com/image_generation_content/watermarked_img_15073086689608332667.png" alt="Josania">
+        </div>
+        <div id="scene-title" class="scene-title">Cena 1</div>
+        <div id="dialog" class="dialog-box">Carregando história...</div>
+        <div id="choices" class="choices-container"></div>
+    </div>
+
+    <div id="final-card" class="final-card">
+        <h2>🎉 Feliz Aniversário, Mãe! 🎉</h2>
+        <p>Se a gente pudesse escolher mil vezes, escolheríamos você em todas elas (mesmo quando o chão ameaça tremer!).</p><br>
+        <p>Obrigado por cuidar tanto de nós, por aguentar nossos gostos complicados de comida, por amar os gatos mais do que a gente e por ser o coração e a alegria da nossa casa.</p><br>
+        <p>A gente te ama infinitamente! <span class="heart">❤️</span></p><br>
+        <p style="text-align: right; font-weight: bold;">Com todo o amor do mundo,<br>Walmir, Nicole, Frederico, Bruna e Laís. ✨</p>
+    </div>
+</div>
+
+<script>
+    const scenes = {
+        1: {
+            title: "O Despertar dos Filhos Legítimos",
+            text: "Bom dia, Josania! O sol nasceu e seus 'filhos legítimos' (o Nenotion e o Snow) já estão miando sem parar na porta do quarto cobrando o café da manhã. O que você faz?",
+            choices: [
+                { text: "Dar o sachê dos dois imediatamente.", next: 2 },
+                { text: "Tentar ignorar e voltar a dormir.", error: "O Nenotion começou a arranhar o sofá e o Snow mia na frequência exata para te dar dor de cabeça. Não tem saída, eles mandam nessa casa!", retry: 1 }
+            ]
+        },
+        2: {
+            title: "O Desastre Botânico",
+            text: "Você vai ao quintal enorme. O Walmir avisa: 'Josania, querida, vou ali rapidinho. Por favor, NÃO MEXA na orquídea, ela acabou de florir!'. O que você faz?",
+            choices: [
+                { text: "Ouvir o Walmir e não encostar na planta.", next: 3 },
+                { text: "Dar 'só um pouquinho' de água para a coitada.", error: "Você mal encostou a água e a orquídea desfalcou na hora! Você lembra que NÃO tem o dedo verde do Walmir. Ele está voltando... rápido, use seus poderes de reversão antes que o chão trema!", retry: 2 }
+            ]
+        },
+        3: {
+            title: "A Aventura de Inhotim",
+            text: "Olhando um souvenir da viagem de carro no mês passado para Minas Gerais... Que viagem marcante! Mas convenhamos, qual foi a parte mais inesquecível daquele hotel?",
+            choices: [
+                { text: "O banheiro peculiar.", next: 4, comment: "Eita hotel abençoado! Pelo menos o saruê daqui de casa já foi pros bombeiros, o de lá ficou no teto..." },
+                { text: "A fumaça suspeita que sempre estava na recepção...", next: 4, comment: "Eita hotel abençoado! Pelo menos o saruê daqui de casa já foi pros bombeiros, o de lá ficou no teto..." },
+                { text: "O 'espírito do saruê' que assombrava o teto oco de noite.", next: 4, comment: "Eita hotel abençoado! Pelo menos o saruê daqui de casa já foi pros bombeiros, o de lá ficou no teto..." }
+            ]
+        },
+        4: {
+            title: "O Dilema dos Genros",
+            text: "Na sala, Nicole e Laís avisam que os namorados vêm jantar. Como você reage ao ver os genros sentados na mesa?",
+            choices: [
+                { text: "Falar que o Fernando é o menino de ouro.", error: "A Nicole fica brava e diz: 'Mãe, você gosta mais do meu namorado do que de mim?!'. O clima pesa cômico na sala.", retry: 4 },
+                { text: "Puxar assunto com o Luís, pois é um homem de poucas palavras.", next: 5 }
+            ]
+        },
+        5: {
+            title: "O Banquete de Aniversário",
+            text: "Toda a prole reunida (Walmir, Nicole, Frederico, Bruna e Laís)! O que a aniversariante vai preparar para o jantar de comemoração?",
+            choices: [
+                { text: "Lasanha caprichada com bastante queijo.", error: "A Nicole passou o resto da noite no banheiro reclamando de lactose. A festa miou!", retry: 5 },
+                { text: "Camarão na moranga chic.", error: "O Frederico olhou pro camarão com cara de nojo e ficou com fome. Não rolou!", retry: 5 },
+                { text: "Salada completa e grelhados fit.", error: "Só o Walmir comemorou. Os 4 filhos te olharam como se fosse castigo. Em pleno aniversário?!", retry: 5 },
+                { text: "Costela de porco ao molho barbecue!", next: "final" }
+            ]
+        }
+    };
+
+    function loadScene(sceneId, customText) {
+        if (sceneId === "final") {
+            document.getElementById("game-view").style.display = "none";
+            document.getElementById("final-card").style.display = "block";
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+            return;
+        }
+
+        const scene = scenes[sceneId];
+        document.getElementById("scene-title").innerText = scene.title;
+        document.getElementById("dialog").innerText = customText || scene.text;
+        
+        const choicesContainer = document.getElementById("choices");
+        choicesContainer.innerHTML = "";
+
+        scene.choices.forEach(choice => {
+            const btn = document.createElement("button");
+            btn.className = "btn-choice";
+            btn.innerText = choice.text;
+            btn.onclick = () => {
+                if (choice.error) {
+                    showError(choice.error, choice.retry);
+                } else if (choice.comment) {
+                    showCommentThenNext(choice.comment, choice.next);
+                } else {
+                    loadScene(choice.next);
+                }
+            };
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function showCommentThenNext(commentText, nextScene) {
+        document.getElementById("dialog").innerText = commentText;
+        const choicesContainer = document.getElementById("choices");
+        choicesContainer.innerHTML = "";
+
+        const btn = document.createElement("button");
+        btn.className = "btn-choice";
+        btn.style.backgroundColor = "#e07a5f";
+        btn.innerText = "Continuar a história ➡️";
+        btn.onclick = () => loadScene(nextScene);
+        choicesContainer.appendChild(btn);
+    }
+
+    function showError(errorText, retryScene) {
+        document.getElementById("scene-title").innerText = "Ops! O chão tremeu! ⚠️";
+        document.getElementById("dialog").innerText = errorText;
+        
+        const choicesContainer = document.getElementById("choices");
+        choicesContainer.innerHTML = "";
+
+        const btn = document.createElement("button");
+        btn.className = "btn-choice";
+        btn.style.backgroundColor = "#e07a5f";
+        btn.innerText = "🔄 Voltar e Tentar Novamente";
+        btn.onclick = () => loadScene(retryScene);
+        choicesContainer.appendChild(btn);
+    }
+
+    loadScene(1);
+</script>
+
+</body>
+</html>
