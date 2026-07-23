@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feliz Aniversário, Mãe!</title>
-    <!-- Biblioteca para o efeito de confetes no final -->
+    <!-- Biblioteca de Confetes -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -13,6 +13,7 @@
             --primary-color: #e07a5f;
             --accent-color: #3d405b;
             --text-color: #2b2d42;
+            --danger-color: #e63946;
         }
 
         * {
@@ -52,17 +53,47 @@
             overflow: hidden;
             border: 4px solid var(--primary-color);
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-
-        .avatar-container:hover {
-            transform: scale(1.03);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .avatar {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        /* --- Animações Dinâmicas --- */
+
+        /* Tremor (O Chão Tremeu!) */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.4);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        /* Pulinho (Reação alegre/cômica) */
+        .bounce {
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* Brilho Final */
+        .glow {
+            border-color: #f4a261 !important;
+            box-shadow: 0 0 25px rgba(244, 162, 97, 0.8);
+            transform: scale(1.05);
         }
 
         .scene-title {
@@ -134,8 +165,9 @@
 
 <div class="game-container">
     <div id="game-view">
-        <div class="avatar-container">
-            <img id="avatar" class="avatar" src="http://googleusercontent.com/image_generation_content/watermarked_img_15073086689608332667.png" alt="Josania">
+        <div id="avatar-box" class="avatar-container">
+            <!-- Imagem Local -->
+            <img id="avatar" class="avatar" src="josania.png" alt="Josania">
         </div>
         <div id="scene-title" class="scene-title">Cena 1</div>
         <div id="dialog" class="dialog-box">Carregando história...</div>
@@ -198,6 +230,13 @@
         }
     };
 
+    function triggerAnimation(className) {
+        const box = document.getElementById("avatar-box");
+        box.classList.remove("shake", "bounce", "glow");
+        void box.offsetWidth; // Forçar re-render para reiniciar a animação
+        box.classList.add(className);
+    }
+
     function loadScene(sceneId, customText) {
         if (sceneId === "final") {
             document.getElementById("game-view").style.display = "none";
@@ -210,6 +249,7 @@
             return;
         }
 
+        triggerAnimation("bounce");
         const scene = scenes[sceneId];
         document.getElementById("scene-title").innerText = scene.title;
         document.getElementById("dialog").innerText = customText || scene.text;
@@ -235,6 +275,7 @@
     }
 
     function showCommentThenNext(commentText, nextScene) {
+        triggerAnimation("bounce");
         document.getElementById("dialog").innerText = commentText;
         const choicesContainer = document.getElementById("choices");
         choicesContainer.innerHTML = "";
@@ -248,6 +289,7 @@
     }
 
     function showError(errorText, retryScene) {
+        triggerAnimation("shake");
         document.getElementById("scene-title").innerText = "Ops! O chão tremeu! ⚠️";
         document.getElementById("dialog").innerText = errorText;
         
